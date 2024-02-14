@@ -1,4 +1,5 @@
 from data_rea import *
+from data_ins import *
 import sklearn as skl
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import GradientBoostingClassifier
@@ -17,14 +18,14 @@ import matplotlib.pyplot as plt
 """Mise en place du modèle Gradient Boosting"""
 
 
-# Initialisez le Gradient Boosting Classifier
-gb_clf = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=42)
+# Initialisation du Gradient Boosting Classifier
+gb_clf_rea = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=42)
 
-# Entraînez le modèle
-gb_clf.fit(features_train, death_train)
+# Entraînement du modèle
+gb_clf_rea.fit(features_train, death_train)
 
 # Prédictions sur l'ensemble de test
-death_pred = gb_clf.predict(features_test)
+death_pred = gb_clf_rea.predict(features_test)
 
 # Évaluation du modèle
 score = roc_auc_score(death_test, death_pred)
@@ -41,56 +42,54 @@ param_grid = {'n_estimators': [115, 116, 117, 118, 119],
               'min_samples_leaf': [8, 9, 10]}
 
 # Initialisation de Gradient Boosting Classifier
-gb_clf = GradientBoostingClassifier(random_state=42)
+gb_clf_rea = GradientBoostingClassifier(random_state=42)
 
 # Création d'une instance de GridSearchCV
-grid_search = GridSearchCV(estimator=gb_clf, param_grid=param_grid, cv=5, n_jobs=-1, verbose=2)
+grid_search_rea = GridSearchCV(estimator=gb_clf_rea, param_grid=param_grid, cv=5, n_jobs=-1, verbose=2)
 
 # Exécutetion de la recherche par grille sur les données d'entraînement
-grid_search.fit(features_train, death_train)
+grid_search_rea.fit(features_train, death_train)
 
 # Les meilleurs paramètres
-print(f"Meilleurs paramètres avec GridSearchCV: {grid_search.best_params_}")
+print(f"Meilleurs paramètres avec GridSearchCV: {grid_search_rea.best_params_}")
 
 
 """Optimisation par RandomizedSearchCV"""
 
 # Définissez la distribution des hyperparamètres à échantillonner
-param_dist = {
+param_dist_rea = {
     'n_estimators': sp_randint(100, 500),  # uniforme discret entre 100 et 500
     'learning_rate': uniform(0.01, 0.2),   # uniforme continu entre 0.01 et 0.21 (0.01 + 0.2)
     'max_depth': sp_randint(3, 10),        # uniforme discret entre 3 et 10
     'min_samples_split': sp_randint(2, 11),# uniforme discret entre 2 et 11
     'min_samples_leaf': sp_randint(1, 11)  # uniforme discret entre 1 et 11
 }
-# Initialisez le Gradient Boosting Classifier
-gb_clf = GradientBoostingClassifier(random_state=42)
 
 # Créez une instance de RandomizedSearchCV
-random_search = RandomizedSearchCV(estimator=gb_clf, param_distributions=param_dist, n_iter=1000, cv=5, n_jobs=-1, verbose=2, random_state=42)
+random_search_rea = RandomizedSearchCV(estimator=gb_clf_rea, param_distributions=param_dist, n_iter=1000, cv=5, n_jobs=-1, verbose=2, random_state=42)
 
 # Exécutez la recherche aléatoire sur les données d'entraînement
-random_search.fit(features_train, death_train)
+random_search_rea.fit(features_train, death_train)
 
 # Affichez les meilleurs paramètres pour RandomizedSearchCV
-print(f"Meilleurs paramètres avec RandomizedSearchCV: {random_search.best_params_}")
+print(f"Meilleurs paramètres avec RandomizedSearchCV: {random_search_rea.best_params_}")
 
 
 """Optimisation par HalvingGridSearchCv"""
 
 # Créez une instance de HalvingGridSearchCV
-halving_grid_search = HalvingGridSearchCV(estimator=gb_clf, param_grid=param_grid, cv=5, n_jobs=-1, verbose=2, factor=2, resource='n_samples', min_resources='smallest', aggressive_elimination=False)
+halving_grid_search_rea = HalvingGridSearchCV(estimator=gb_clf_rea, param_grid=param_grid, cv=5, n_jobs=-1, verbose=2, factor=2, resource='n_samples', min_resources='smallest', aggressive_elimination=False)
 
 # Exécutez la recherche par grille avec diminution sur les données d'entraînement
-halving_grid_search.fit(features_train, death_train)
+halving_grid_search_rea.fit(features_train, death_train)
 
 # Affichez les meilleurs paramètres
-print(f"Meilleurs paramètres avec HalvingGridSearchCV: {halving_grid_search.best_params_}")
+print(f"Meilleurs paramètres avec HalvingGridSearchCV: {halving_grid_search_rea.best_params_}")
 
 
 """Optimisation par optuna"""
 
-def objective(trial):
+def objective_rea(trial):
     # Définition de l'espace de recherche des hyperparamètres
     n_estimators = trial.suggest_int('n_estimators', 100, 500)
     max_depth = trial.suggest_int('max_depth', 3, 9)
@@ -113,10 +112,10 @@ def objective(trial):
 
     # Optuna veut minimiser la fonction objectif donc on retourne le négatif de l'accuracy
     return -score.mean()
-
+    
 # Création de l'étude qui va contenir toutes les informations de l'optimisation
 study = optuna.create_study(direction='minimize')
-study.optimize(objective, n_trials=100)
+study.optimize(objective_rea, n_trials=100)
 
 # Affichage des meilleurs hyperparamètres
 print(study.best_params)
@@ -125,14 +124,52 @@ print(study.best_params)
 """Création du modèle optimal"""
 
 # Initialisez le Gradient Boosting Classifier
-gb_clf_gs = GradientBoostingClassifier(**grid_search.best_params_)
+gb_clf_rea = GradientBoostingClassifier(**grid_search_rea.best_params_)
 
 # Entraînez le modèle
-gb_clf_gs.fit(features_train, death_train)
+gb_clf_rea.fit(features_train, death_train)
 
 # Prédictions sur l'ensemble de test
-death_pred = gb_clf_gs.predict(features_test)
+death_pred = gb_clf_rea.predict(features_test)
 
 # Évaluation du modèle
 score = roc_auc_score(death_test, death_pred)
 print(f"Score: {score}")
+
+
+"""----------- Mise en place du modèle Gradient Boosting pour insurance -----------"""
+
+# Optimsiation des hyperparamètres
+
+#1ère approche en utilisant optuna :
+
+def objective_ins(trial):
+    # Définition de l'espace de recherche des hyperparamètres
+    n_estimators = trial.suggest_int('n_estimators', 100, 500)
+    max_depth = trial.suggest_int('max_depth', 3, 9)
+    min_samples_split = trial.suggest_int('min_samples_split', 2, 10)
+    min_samples_leaf = trial.suggest_int('min_samples_leaf', 1, 10)
+    learning_rate = trial.suggest_loguniform('learning_rate', 0.01, 0.3)
+
+    # Création du modèle avec les hyperparamètres suggérés
+    clf = GradientBoostingClassifier(
+        n_estimators=n_estimators,
+        max_depth=max_depth,
+        min_samples_split=min_samples_split,
+        min_samples_leaf=min_samples_leaf,
+        learning_rate=learning_rate,
+        random_state=42
+    )
+
+    # Calcul de la validation croisée
+    score = cross_val_score(clf, ins_features_train, ins_credit_train, n_jobs=-1, cv=3)
+
+    # Optuna veut minimiser la fonction objectif donc on retourne le négatif de l'accuracy
+    return -score.mean()
+
+# Création de l'étude qui va contenir toutes les informations de l'optimisation
+study = optuna.create_study(direction='minimize')
+study.optimize(objective_ins, n_trials=100)
+
+# Affichage des meilleurs hyperparamètres
+print(study.best_params)
