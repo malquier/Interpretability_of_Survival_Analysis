@@ -84,3 +84,27 @@ def generate_random_numbers(min_val, max_val, n):
     for _ in range(n):
         random_numbers.append(random.uniform(min_val, max_val))
     return random_numbers
+
+
+"""This function aims to generate a dictionary of random number knowing max_val et min_val giving in a dictionary at the beginning"""
+def random_number_dict(dictionary):
+    random_numbers = {}
+    for key, bounds in dictionary.items():
+        # If the values are int 
+        if isinstance(bounds[0], int):
+            [min_val, max_val] = bounds
+
+            # Generate a random number within the bounds and store it in the result dictionary
+            random_numbers[key] = random.randint(min_val, max_val)
+
+        # If the values are float   
+        elif isinstance(bounds[0],float):
+            [min_val, max_val] = bounds
+
+            # Generate a random number within the bounds and store it in the result dictionary
+            random_numbers[key] = random.uniform(min_val, max_val)
+
+        elif isinstance(bounds[0], str):
+            random_numbers[key] = random.choice(bounds)
+
+    return random_numbers
