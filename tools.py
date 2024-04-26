@@ -2,6 +2,7 @@
 import numpy as np
 from itertools import product
 from sksurv.metrics import concordance_index_censored
+import random
 
 
 
@@ -53,7 +54,7 @@ def generate_param_grid(optimal_params, num_samples=3, percent_range=0.1):
             param_values.append(param_value)
 
         elif isinstance(param_value, str):
-            param_values = param_value
+            param_values = [param_value]
 
         param_grid[param_name] = param_values
 
@@ -75,3 +76,11 @@ def count_combinations(dic):
         if not(isinstance(values[0],bool)):
             nb_comb = nb_comb * len(values)
     return nb_comb
+
+
+"""This function aims to genereate n random numbers between min_val and max_val"""
+def generate_random_numbers(min_val, max_val, n):
+    random_numbers = []
+    for _ in range(n):
+        random_numbers.append(random.uniform(min_val, max_val))
+    return random_numbers
