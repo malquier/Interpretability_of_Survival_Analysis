@@ -26,7 +26,7 @@ Ce rapport a été rédigé par Mattéo Alquier, Emile Cassant et Marama Simonea
 
 ## Historique des versions
 
-1.0 : 16/05/2024
+  - Version 1.0 : 16/05/2024
 
 
 ## Note
